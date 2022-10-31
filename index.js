@@ -1,11 +1,14 @@
+const { createSocket } = require('dgram')
+
 const app = require('express')()
 const http = require('http').createServer(app)
 const io = require('socket.io')(http, {
     cors: {
         origins: [
             'http://127.0.0.1:5173/',
-            'http://localhost:8080',
+            'http://127.0.0.1:8080/',
             'http://127.0.0.1:5175/',
+            'http://127.0.0.1:5174/',
 
         ]
     }
@@ -15,19 +18,33 @@ app.get('/', (req, res) => {
     res.send('<h1>Hey Socket.io</h1>')
 })
 
+
+// multiplayerGameObject
+let multiplayerGameObject = {}
+
 io.on('connection', (socket) => {
     console.log('Usuario Conectado')
 
-    // evento de juego de cartas. Cuando la carta se manda al centro
-    socket.on('cardToCenterBoard', (cardValue) => {
-        console.log('en servidor sumé 10 pts a la carta', cardValue)
-        cardValue.cardNumber = cardValue.cardNumber + 10
-        io.sockets.emit('CARD_INCREMENT', cardValue)
+    socket.on('newPlayerConnected', (playerID) => {
+        console.log('este es el playerID', playerID + ' y el socket: ' + socket.id)
+
+        // se registra otro jugador en el objeto de juego.
+        multiplayerGameObject[playerID] = {playerID: playerID, card: null, showValue: false}
     })
 
-    socket.on('increment', (counter) => {
-        console.log('Increment')
-        io.sockets.emit('COUNTER_INCREMENT', counter + 1)
+    // evento de juego de cartas. Cuando la carta se manda al centro
+    socket.on('cardToCenterBoard', (cardPlayed, playerID) => {
+
+        
+        multiplayerGameObject[playerID] = cardPlayed[playerID]
+        
+        io.sockets.emit('CARD_PLAYED', multiplayerGameObject)
+        console.log('MGO',multiplayerGameObject)
+    })
+
+    socket.on('cardIsRemoved', (multiplayerCardArray) => {
+        console.log('a card was removed')
+        io.sockets.emit('CARD_REMOVED', multiplayerCardArray)
     })
 
     socket.on('decrement', (counter) => {
