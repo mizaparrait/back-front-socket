@@ -1,4 +1,3 @@
-const { createSocket } = require('dgram')
 
 const app = require('express')()
 const http = require('http').createServer(app)
@@ -19,7 +18,8 @@ app.get('/', (req, res) => {
 })
 
 
-// multiplayerGameObject
+// MultiplayerGameObject (referido como MGO de manera corta). Objeto con todas las tarjetas que juegen los jugadores.
+// Es el objeto que permite el funcionamiento de la aplicación, y siempre tiene la información actualizada.
 let multiplayerGameObject = {}
 
 io.on('connection', (socket) => {
@@ -28,17 +28,23 @@ io.on('connection', (socket) => {
     socket.on('newPlayerConnected', (playerID) => {
         console.log('este es el playerID', playerID + ' y el socket: ' + socket.id)
 
-        // se registra otro jugador en el objeto de juego.
-        multiplayerGameObject[playerID] = {playerID: playerID, card: null, showValue: false}
+        // se registra un nuevo jugador en el objeto de juego.
+        // -1 significa que no hay carta seleccionada
+        multiplayerGameObject[playerID] = {playerID: playerID, card: {cardNumber: -1, position: -1}, showValue: false}
     })
 
-    // evento de juego de cartas. Cuando la carta se manda al centro
-    socket.on('cardToCenterBoard', (cardPlayed, playerID) => {
+    /**
+     * Evento que se ejecuta cuando cualquier jugador desde el cliente
+     * manda una carta al centro. 
+     */
+    socket.on('cardToCenterBoard', (playerID, cardPlayed) => {
 
-        
+        // Se cambia la carta jugada de un jugador en específico dentro del objeto MGO.
         multiplayerGameObject[playerID] = cardPlayed[playerID]
         
+        // Envía los últimos cambios a todos los jugadores de la app.
         io.sockets.emit('CARD_PLAYED', multiplayerGameObject)
+
         console.log('MGO',multiplayerGameObject)
     })
 
