@@ -48,9 +48,10 @@ io.on('connection', (socket) => {
         console.log('MGO',multiplayerGameObject)
     })
 
-    socket.on('cardIsRemoved', (multiplayerCardArray) => {
-        console.log('a card was removed')
-        io.sockets.emit('CARD_REMOVED', multiplayerCardArray)
+    socket.on('cardReset', (playerID ,cardReset) => {
+        console.log('player',playerID, 'removed a card')
+        multiplayerGameObject = cardReset
+        io.sockets.emit('CARD_REMOVED', multiplayerGameObject)
     })
 
     socket.on('decrement', (counter) => {
