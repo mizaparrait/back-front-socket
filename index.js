@@ -28,9 +28,12 @@ io.on('connection', (socket) => {
     socket.on('newPlayerConnected', (playerID) => {
         console.log('este es el playerID', playerID + ' y el socket: ' + socket.id)
 
-        // se registra un nuevo jugador en el objeto de juego.
+        // se registra un nuevo jugador en el objeto de juego (MGO).
         // -1 significa que no hay carta seleccionada
         multiplayerGameObject[playerID] = {playerID: playerID, card: {cardNumber: -1, position: -1}, showValue: false}
+
+        // actualizamos objeto que indica que se unió otro jugador a la sala
+        io.sockets.emit('PLAYER_JOINED', multiplayerGameObject)
     })
 
     /**
