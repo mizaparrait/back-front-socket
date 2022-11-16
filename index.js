@@ -58,6 +58,12 @@ io.on('connection', (socket) => {
         io.sockets.emit('ALL_CARDS_ON_CENTER')
     })
 
+
+    socket.on('revealBtnPressed', () => {
+        console.log('emite evento')
+        io.sockets.emit('REVEAL_CARDS')
+    })
+
     socket.on('cardReset', (playerID ,cardReset) => {
         console.log('player',playerID, 'removed a card')
         multiplayerGameObject = cardReset
