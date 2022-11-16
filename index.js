@@ -74,7 +74,6 @@ io.on('connection', (socket) => {
 
 
     socket.on('revealBtnPressed', () => {
-        console.log('emite evento')
         io.sockets.emit('REVEAL_CARDS')
     })
 
