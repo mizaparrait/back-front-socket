@@ -25,12 +25,12 @@ let multiplayerGameObject = {}
 io.on('connection', (socket) => {
     console.log('Usuario Conectado')
 
-    socket.on('newPlayerConnected', (playerID) => {
+    socket.on('newPlayerConnected', (playerID, playerName) => {
         console.log('este es el playerID', playerID + ' y el socket: ' + socket.id)
 
         // se registra un nuevo jugador en el objeto de juego (MGO).
-        // -1 significa que no hay carta seleccionada
-        multiplayerGameObject[playerID] = {playerID: playerID, card: {cardNumber: -1, position: -1}, showValue: false}
+        // -1 significa que no hay carta seleccionada. ID de -1 es que un jugador no tiene ID.
+        multiplayerGameObject[playerID] = {playerName: playerName, playerID: playerID, card: {cardNumber: -1, position: -1}, showValue: false}
 
         // actualizamos objeto que indica que se unió otro jugador a la sala
         io.sockets.emit('PLAYER_JOINED', multiplayerGameObject)
@@ -49,6 +49,13 @@ io.on('connection', (socket) => {
         io.sockets.emit('CARD_PLAYED', multiplayerGameObject)
 
         console.log('MGO',multiplayerGameObject)
+    })
+
+    /**
+     * Funcion donde si todos los jugadores suben una carta, se despliega el boton de "Revelar" en el cliente.
+     */
+    socket.on('allCardsOnCenter', () => {
+        io.sockets.emit('ALL_CARDS_ON_CENTER')
     })
 
     socket.on('cardReset', (playerID ,cardReset) => {
