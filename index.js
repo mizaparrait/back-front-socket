@@ -72,9 +72,14 @@ io.on('connection', (socket) => {
         io.sockets.emit('ALL_CARDS_ON_CENTER')
     })
 
-
+    // revela todas las cartas para todos los jugadores.
     socket.on('revealBtnPressed', () => {
         io.sockets.emit('REVEAL_CARDS')
+    })
+
+    // si un jugador presiona el boton de "Revelar", este desaparecera para todos los jugadores gracias a este evento.
+    socket.on('hideRevealBtn', () => {
+        io.sockets.emit('HIDE_REVEAL_BUTTON')
     })
 
     socket.on('cardReset', (playerID ,cardReset) => {
