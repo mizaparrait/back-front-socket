@@ -1,5 +1,9 @@
+const { urlencoded, json } = require('express')
+const { userInfo } = require('os')
 
 const app = require('express')()
+const mongoose = require('mongoose')
+const user = require('./user.controller')
 const http = require('http').createServer(app)
 const io = require('socket.io')(http, {
     cors: {
@@ -13,10 +17,20 @@ const io = require('socket.io')(http, {
     }
 })
 
-app.get('/', (req, res) => {
-    res.send('<h1>Hey Socket.io</h1>')
-})
+app.use(json())
 
+mongoose.connect('mongodb+srv://miza:123456db@testsock.syc2nfw.mongodb.net/pokerdb?retryWrites=true&w=majority')
+
+app.get('/users', user.list)
+app.get('/users/:id', user.get)
+app.post('/users', user.create)
+app.put('/users/:id', user.update)
+app.patch('/users/:id', user.update)
+app.delete('/users/:id', user.destroy)
+
+app.get('*', (req, res) => {
+    res.status(404).send('Esta pagina no existe')
+})
 
 // MultiplayerGameObject (referido como MGO de manera corta). Objeto con todas las tarjetas que juegen los jugadores.
 // Es el objeto que permite el funcionamiento de la aplicación, y siempre tiene la información actualizada.
@@ -70,5 +84,6 @@ io.on('connection', (socket) => {
 http.listen(3001, () => {
     console.log('Servidor Iniciado en puerto 3001')
 })
+
 
 module.exports = app
