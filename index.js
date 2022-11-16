@@ -88,6 +88,14 @@ io.on('connection', (socket) => {
         io.sockets.emit('CARD_REMOVED', multiplayerGameObject)
     })
 
+    socket.on('globalGameReset', (clearedMultiplayerGameObject) => {
+        multiplayerGameObject = clearedMultiplayerGameObject
+        console.log('ahora es', multiplayerGameObject)
+
+        // hacer un emit al cliente para todos los jugadores con el nuevo MGO
+        io.sockets.emit('GLOBAL_GAME_RESET', multiplayerGameObject)
+    })
+
     socket.on('decrement', (counter) => {
         console.log('Decrement')
         io.sockets.emit('COUNTER_DECREMENT', counter - 1)
